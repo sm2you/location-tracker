@@ -1,17 +1,62 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Send My Location</title>
+  <title>📍 Location Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 40px;
+      background: #f9f9f9;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      max-width: 600px;
+      margin: 30px auto 0;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
-<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
+
+<body>
   <h2>📍 Share Your Location</h2>
   <p>Tap the button below to send your current location to the backend.</p>
-  <button style="padding:15px 30px;font-size:18px;" onclick="getLocation()">Send My Location</button>
-  <div id="status" style="margin-top:20px;"></div>
+  <button onclick="getLocation()">Send My Location</button>
+  <div id="status"></div>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
     function getLocation() {
@@ -35,21 +80,19 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latitude: lat, longitude: lon })
       })
-
         .then(response => {
           console.log("Response status:", response.status);
           if (response.ok) {
             updateStatus("✅ Location sent successfully!");
+            showMap(lat, lon);
           } else {
             updateStatus(`⚠️ Failed to send location: ${response.status}`);
           }
         })
-        
         .catch(err => {
           console.error("❌ Fetch error:", err);
           updateStatus("❌ Network error occurred.");
         });
-
     }
 
     function error() {
@@ -58,6 +101,18 @@
 
     function updateStatus(message) {
       document.getElementById("status").textContent = message;
+    }
+
+    function showMap(lat, lon) {
+      const map = L.map('map').setView([lat, lon], 15);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker([lat, lon]).addTo(map)
+        .bindPopup("You are here 📍")
+        .openPopup();
     }
   </script>
 </body>
