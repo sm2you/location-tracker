@@ -29,9 +29,9 @@
 
       updateStatus("📡 Sending your location...");
 
-      fetch("https://a63e0633-d5d3-4555-9868-a4d91f9a59e2-00-2qzevgk3ia1d3.worf.replit.dev/", {
+      fetch("https://location-tracker-adow.onrender.com/location-handler", {
         method: "POST",
-        mode: "cors", // ✅ Add this line
+        mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latitude: lat, longitude: lon })
       })
