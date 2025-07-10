@@ -1,0 +1,64 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Send My Location</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
+  <h2>📍 Share Your Location</h2>
+  <p>Tap the button below to send your current location to the backend.</p>
+  <button style="padding:15px 30px;font-size:18px;" onclick="getLocation()">Send My Location</button>
+  <div id="status" style="margin-top:20px;"></div>
+
+  <script>
+    function getLocation() {
+      if (!navigator.geolocation) {
+        updateStatus("❌ Location services not supported.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+
+    function success(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      updateStatus("📡 Sending your location...");
+
+      fetch("https://a63e0633-d5d3-4555-9868-a4d91f9a59e2-00-2qzevgk3ia1d3.worf.replit.dev/", {
+        method: "POST",
+        mode: "cors", // ✅ Add this line
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: lat, longitude: lon })
+      })
+
+        .then(response => {
+          console.log("Response status:", response.status);
+          if (response.ok) {
+            updateStatus("✅ Location sent successfully!");
+          } else {
+            updateStatus(`⚠️ Failed to send location: ${response.status}`);
+          }
+        })
+        
+        .catch(err => {
+          console.error("❌ Fetch error:", err);
+          updateStatus("❌ Network error occurred.");
+        });
+
+    }
+
+    function error() {
+      updateStatus("❌ Unable to access your location.");
+    }
+
+    function updateStatus(message) {
+      document.getElementById("status").textContent = message;
+    }
+  </script>
+</body>
+</html>
